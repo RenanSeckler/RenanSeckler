@@ -1,0 +1,358 @@
+<title>Tempo de Mudança</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: formulário de levantamento à esquerda, orçamento de tempo fixo à direita; uma coluna no celular. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #17212b;
+  --muted: #5b6774;
+  --line: #d5dbe2;
+  --tape: #e3a008;      /* fita de mudança */
+  --tape-ink: #3a2a00;
+  --road: #2f7d86;
+  --warn-bg: #fff4d6;
+  --warn-ink: #6b4a00;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --ph-embalagem: #9aa7b4;
+  --ph-preparo: #b9c2cc;
+  --ph-desmontagem: #c98a1e;
+  --ph-carga: #e3a008;
+  --ph-deslocamento: #2f7d86;
+  --ph-descarga: #f0c454;
+  --ph-montagem: #a66f12;
+  --ph-almoco: #d9dee4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171d; --surface: #1a222b; --ink: #e8edf2; --muted: #9aa6b2; --line: #2c3743;
+    --tape: #f0b429; --tape-ink: #241a00; --road: #5fb3bc; --warn-bg: #3a2e10; --warn-ink: #f6d68a;
+    --ph-embalagem: #6b7886; --ph-preparo: #4d5966; --ph-desmontagem: #d39a35; --ph-carga: #f0b429;
+    --ph-deslocamento: #5fb3bc; --ph-descarga: #f6d277; --ph-montagem: #b98226; --ph-almoco: #36414d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171d; --surface: #1a222b; --ink: #e8edf2; --muted: #9aa6b2; --line: #2c3743;
+  --tape: #f0b429; --tape-ink: #241a00; --road: #5fb3bc; --warn-bg: #3a2e10; --warn-ink: #f6d68a;
+  --ph-embalagem: #6b7886; --ph-preparo: #4d5966; --ph-desmontagem: #d39a35; --ph-carga: #f0b429;
+  --ph-deslocamento: #5fb3bc; --ph-descarga: #f6d277; --ph-montagem: #b98226; --ph-almoco: #36414d;
+  color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45; }
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 24px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.4rem); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h1 span { background: var(--tape); color: var(--tape-ink); padding: 0 .25em; }
+header p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } .result { order: -1; position: static !important; } }
+
+.form { display: grid; gap: 16px; min-width: 0; }
+fieldset { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; margin: 0; padding: 16px 18px 18px; min-width: 0; }
+legend { font-family: var(--f-display); font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0 6px; }
+
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 18px; }
+.item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.item .nm { min-width: 0; }
+.item .vol { display: block; color: var(--muted); font-family: var(--f-data); font-size: .72rem; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 4px; flex: none; }
+.stepper button { width: 30px; height: 30px; border: 0; background: transparent; color: var(--ink); font-size: 1.1rem; cursor: pointer; }
+.stepper button:hover { background: var(--bg); }
+.stepper input { width: 34px; text-align: center; border: 0; background: transparent; color: var(--ink); font-family: var(--f-data); font-size: .9rem; -moz-appearance: textfield; }
+.stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.row { display: flex; flex-wrap: wrap; gap: 14px 20px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label, .lbl { font-size: .85rem; color: var(--muted); }
+.field input[type=number], select {
+  font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+  padding: 6px 8px; width: 100%; box-sizing: border-box;
+}
+.field input[type=number] { width: 7.5em; font-family: var(--f-data); }
+.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--tape); }
+.sides { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+@media (max-width: 520px) { .sides { grid-template-columns: 1fr; } }
+.side h3 { font-family: var(--f-display); font-size: 1rem; margin: 0 0 8px; }
+.side .row { gap: 12px 16px; }
+:focus-visible { outline: 2px solid var(--road); outline-offset: 2px; }
+
+.result { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; min-width: 0; }
+.result .head { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--f-display); font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.total { font-family: var(--f-display); font-weight: 800; font-size: 3rem; line-height: 1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.range { color: var(--muted); margin-top: 6px; font-size: .92rem; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chip { font-family: var(--f-data); font-size: .76rem; padding: 3px 8px; border-radius: 3px; background: var(--bg); border: 1px solid var(--line); }
+
+.section { padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.section:last-child { border-bottom: 0; }
+.bar { display: flex; height: 14px; border-radius: 2px; overflow: hidden; margin: 10px 0 12px; background: var(--bg); }
+.bar span { display: block; height: 100%; }
+.phases { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.phases li { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: 10px; font-size: .92rem; }
+.phases li.zero { color: var(--muted); opacity: .6; }
+.sw { width: 12px; height: 12px; border-radius: 2px; }
+.num { font-family: var(--f-data); font-size: .85rem; font-variant-numeric: tabular-nums; }
+
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; font-weight: 600; color: var(--muted); font-size: .78rem; padding: 4px 0; }
+td { padding: 4px 0; border-top: 1px dashed var(--line); }
+td.num, th.r { text-align: right; }
+tr.on td { font-weight: 600; }
+tr.on td:first-child::before { content: "▸ "; color: var(--tape); }
+
+.alerts { display: grid; gap: 8px; }
+.alert { background: var(--warn-bg); color: var(--warn-ink); padding: 8px 10px; border-radius: 4px; font-size: .88rem; }
+.cost-total { font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.rates { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 10px; }
+.rates .field input { width: 6.5em; }
+.note { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: inherit; font-size: .88rem; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--tape); color: var(--tape-ink); border-color: var(--tape); font-weight: 600; }
+#copiado { font-size: .85rem; color: var(--muted); align-self: center; }
+textarea { width: 100%; box-sizing: border-box; font-family: var(--f-data); font-size: .78rem; margin-top: 8px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Tempo de <span>Mudança</span></h1>
+    <p>Preencha o levantamento do imóvel e veja quanto tempo a mudança leva, fase por fase. Os valores abaixo são um exemplo de apartamento de 2 quartos.</p>
+  </header>
+
+  <div class="grid">
+    <form class="form" id="form" autocomplete="off">
+      <fieldset>
+        <legend>Inventário</legend>
+        <div class="items" id="itens"></div>
+        <div class="row" style="margin-top:14px">
+          <div class="field">
+            <label for="caixas">Caixas (50 × 40 × 30 cm)</label>
+            <input type="number" id="caixas" min="0" step="1" value="40">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Serviços</legend>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="montagem" checked> Desmontar e montar móveis</label>
+          <label class="check"><input type="checkbox" id="embalagem"> A equipe embala as caixas</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Acesso</legend>
+        <div class="sides">
+          <div class="side">
+            <h3>Origem</h3>
+            <div class="row">
+              <div class="field"><label for="o_andar">Andar</label><input type="number" id="o_andar" min="0" value="2"></div>
+              <div class="field"><label for="o_dist">Caminhão até a porta (m)</label><input type="number" id="o_dist" min="0" value="15"></div>
+            </div>
+            <label class="check" style="margin-top:10px"><input type="checkbox" id="o_elev"> Tem elevador que cabe móveis</label>
+          </div>
+          <div class="side">
+            <h3>Destino</h3>
+            <div class="row">
+              <div class="field"><label for="d_andar">Andar</label><input type="number" id="d_andar" min="0" value="5"></div>
+              <div class="field"><label for="d_dist">Caminhão até a porta (m)</label><input type="number" id="d_dist" min="0" value="20"></div>
+            </div>
+            <label class="check" style="margin-top:10px"><input type="checkbox" id="d_elev" checked> Tem elevador que cabe móveis</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Transporte e equipe</legend>
+        <div class="row">
+          <div class="field"><label for="distancia">Distância (km)</label><input type="number" id="distancia" min="0" step="0.5" value="12"></div>
+          <div class="field" style="min-width:200px"><label for="veiculo">Veículo</label><select id="veiculo"></select></div>
+          <div class="field"><label for="equipe">Equipe (pessoas)</label><input type="number" id="equipe" min="1" max="12" value="4"></div>
+        </div>
+        <label class="check" style="margin-top:12px"><input type="checkbox" id="pico"> Trajeto em horário de pico</label>
+      </fieldset>
+    </form>
+
+    <aside class="result" aria-live="polite">
+      <div class="head">
+        <div class="eyebrow">Tempo estimado</div>
+        <div class="total" id="total">–</div>
+        <div class="range" id="range"></div>
+        <div class="facts" id="facts"></div>
+      </div>
+      <div class="section">
+        <div class="eyebrow">Fases</div>
+        <div class="bar" id="bar" role="img" aria-label="Distribuição do tempo por fase"></div>
+        <ul class="phases" id="fases"></ul>
+      </div>
+      <div class="section" id="alertasBox">
+        <div class="alerts" id="alertas"></div>
+      </div>
+      <div class="section">
+        <div class="eyebrow">Tamanho da equipe</div>
+        <table>
+          <thead><tr><th>Pessoas</th><th class="r">Duração</th><th class="r">Pessoa-horas</th></tr></thead>
+          <tbody id="equipes"></tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="eyebrow">Custo estimado</div>
+        <div class="cost-total" id="custo">–</div>
+        <div class="num" id="custoDet" style="color:var(--muted)"></div>
+        <div class="rates">
+          <div class="field"><label for="t_pessoa">R$ / pessoa-hora</label><input type="number" id="t_pessoa" min="0" value="45"></div>
+          <div class="field"><label for="t_veiculo">R$ / hora de veículo</label><input type="number" id="t_veiculo" min="0" value="120"></div>
+          <div class="field"><label for="t_km">R$ / km</label><input type="number" id="t_km" min="0" step="0.5" value="4"></div>
+        </div>
+        <p class="note">Tarifas de exemplo. Troque pelas da sua empresa.</p>
+      </div>
+      <div class="section">
+        <div class="actions">
+          <button type="button" class="btn primary" id="copiar">Copiar orçamento</button>
+          <span id="copiado"></span>
+        </div>
+        <textarea id="resumo" rows="6" readonly hidden></textarea>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="estimativa.js"></script>
+<script>
+(function () {
+  const M = window.Mudanca;
+  const $ = (id) => document.getElementById(id);
+  const EXEMPLO = {
+    cama_casal: 1, cama_solteiro: 1, guarda_roupa_3p: 1, guarda_roupa_6p: 1, comoda: 1, sofa_3: 1,
+    rack: 1, tv: 2, mesa_jantar: 1, geladeira: 1, fogao: 1, maquina_lavar: 1, micro_ondas: 1,
+  };
+
+  const itensEl = $('itens');
+  for (const it of M.ITENS) {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML =
+      `<label class="nm" for="q_${it.id}">${it.nome}<span class="vol">${it.volume.toLocaleString('pt-BR')} m³</span></label>` +
+      `<span class="stepper"><button type="button" data-d="-1" aria-label="Menos ${it.nome}">−</button>` +
+      `<input type="number" id="q_${it.id}" min="0" value="${EXEMPLO[it.id] || 0}">` +
+      `<button type="button" data-d="1" aria-label="Mais ${it.nome}">+</button></span>`;
+    itensEl.appendChild(div);
+  }
+  itensEl.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-d]');
+    if (!b) return;
+    const input = b.parentElement.querySelector('input');
+    input.value = Math.max(0, (Number(input.value) || 0) + Number(b.dataset.d));
+    atualizar();
+  });
+
+  const sel = $('veiculo');
+  for (const v of M.VEICULOS) {
+    const o = document.createElement('option');
+    o.value = v.id;
+    o.textContent = `${v.nome} · ${v.capacidade} m³`;
+    sel.appendChild(o);
+  }
+  sel.value = 'tres_quartos';
+
+  function horas(h) {
+    let min = Math.round((h * 60) / 5) * 5;
+    const hh = Math.floor(min / 60);
+    min -= hh * 60;
+    if (hh === 0) return `${min} min`;
+    return min ? `${hh} h ${String(min).padStart(2, '0')}` : `${hh} h`;
+  }
+  const reais = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const m3 = (v) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' m³';
+  const num = (id) => Number($(id).value) || 0;
+
+  function lerEntrada() {
+    const itens = {};
+    for (const it of M.ITENS) itens[it.id] = num('q_' + it.id);
+    return {
+      itens,
+      caixas: num('caixas'),
+      montagem: $('montagem').checked,
+      embalagem: $('embalagem').checked,
+      origem: { andar: num('o_andar'), elevador: $('o_elev').checked, distanciaPorta: num('o_dist') },
+      destino: { andar: num('d_andar'), elevador: $('d_elev').checked, distanciaPorta: num('d_dist') },
+      distanciaKm: num('distancia'),
+      veiculo: sel.value,
+      equipe: Math.max(1, num('equipe')),
+      pico: $('pico').checked,
+    };
+  }
+
+  function atualizar() {
+    const e = lerEntrada();
+    const r = M.estimar(e);
+
+    $('total').textContent = horas(r.total);
+    $('range').textContent = `Entre ${horas(r.minimo)} e ${horas(r.maximo)}`;
+    $('facts').innerHTML = [
+      m3(r.volume),
+      `${r.viagens} ${r.viagens > 1 ? 'viagens' : 'viagem'}`,
+      `${r.equipe} ${r.equipe > 1 ? 'pessoas' : 'pessoa'}`,
+      r.veiculo.nome,
+    ].map((t) => `<span class="chip">${t}</span>`).join('');
+
+    $('bar').innerHTML = r.fases.filter((f) => f.horas > 0)
+      .map((f) => `<span style="width:${(f.horas / r.total) * 100}%;background:var(--ph-${f.id})" title="${f.nome}: ${horas(f.horas)}"></span>`).join('');
+    $('fases').innerHTML = r.fases.map((f) =>
+      `<li class="${f.horas > 0 ? '' : 'zero'}"><span class="sw" style="background:var(--ph-${f.id})"></span>` +
+      `<span>${f.nome}</span><span class="num">${f.horas > 0 ? horas(f.horas) : '—'}</span></li>`).join('');
+
+    $('alertas').innerHTML = r.alertas.map((a) => `<div class="alert">${a}</div>`).join('');
+    $('alertasBox').hidden = r.alertas.length === 0;
+
+    $('equipes').innerHTML = M.compararEquipes(e, 2, 6).map((l) =>
+      `<tr class="${l.equipe === r.equipe ? 'on' : ''}"><td>${l.equipe}</td><td class="num">${horas(l.total)}</td>` +
+      `<td class="num">${l.pessoaHoras.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}</td></tr>`).join('');
+
+    const c = M.custo(r, e, { porPessoaHora: num('t_pessoa'), veiculoHora: num('t_veiculo'), porKm: num('t_km') });
+    $('custo').textContent = reais(c.total);
+    $('custoDet').textContent = `Equipe ${reais(c.maoDeObra)} · Veículo ${reais(c.veiculo)} · Km ${reais(c.rodagem)}`;
+
+    const itensTxt = M.ITENS.filter((it) => e.itens[it.id] > 0).map((it) => `${e.itens[it.id]}× ${it.nome}`).join(', ');
+    $('resumo').value =
+      `Orçamento de mudança\n` +
+      `Tempo estimado: ${horas(r.total)} (entre ${horas(r.minimo)} e ${horas(r.maximo)})\n` +
+      `Volume: ${m3(r.volume)} · ${r.viagens} viagem(ns) em ${r.veiculo.nome} · equipe de ${r.equipe}\n` +
+      `Itens: ${itensTxt}${e.caixas ? `, ${e.caixas} caixas` : ''}\n` +
+      `Valor estimado: ${reais(c.total)}`;
+  }
+
+  $('form').addEventListener('input', atualizar);
+  $('form').addEventListener('submit', (ev) => ev.preventDefault());
+  document.querySelectorAll('.rates input').forEach((i) => i.addEventListener('input', atualizar));
+
+  $('copiar').addEventListener('click', () => {
+    const txt = $('resumo').value;
+    const ok = () => { $('copiado').textContent = 'Copiado'; };
+    const falha = () => {
+      const ta = $('resumo');
+      ta.hidden = false; ta.focus(); ta.select();
+      $('copiado').textContent = 'Selecione e copie o texto abaixo';
+    };
+    try { navigator.clipboard.writeText(txt).then(ok, falha); } catch (_) { falha(); }
+  });
+
+  atualizar();
+})();
+</script>
