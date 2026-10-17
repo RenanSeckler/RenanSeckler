@@ -27,10 +27,10 @@ STRUCTS = ["A - Terceirizar", "B - Alugar", "C - Comprar"]
 
 # (chave, rótulo, unidade, [Cons, Base, Otim], formato, fonte/status)
 CASE_INPUTS = [
-    ("jobs", "Mudanças por mês", "jobs", [8, 14, 22], NUM,
-     "PENDENTE: histórico real da Seckler. FMCSA mostra 1 caminhão/1 motorista (localmovers.com)."),
-    ("ticket", "Ticket médio por mudança", "US$", [850, 1100, 1300], USD,
-     "moveBuddha Orlando: US$672-1.550 (1-2 quartos); FreightWaves: US$306-2.712. Validar com faturas."),
+    ("jobs", "Mudanças por mês", "jobs", [24, 30, 36], NUM,
+     "Renan (17/10/2026): ~30 mudanças/mês com 2 caminhões. Conservador -20%, otimista +20%."),
+    ("ticket", "Ticket médio por mudança", "US$", [900, 1000, 1100], USD,
+     "Renan (17/10/2026): ticket médio ~US$1.000, mínimo US$450. Coerente com moveBuddha Orlando (US$672-1.550)."),
     ("cv_mov", "Custo variável da mudança", "% receita", [0.58, 0.55, 0.52], PCT,
      "PREMISSA: mão de obra, combustível, materiais, comissões. Substituir pela DRE real."),
     ("packouts", "Pack-outs (sinistros) por mês", "jobs", [0, 1, 3], NUM,
